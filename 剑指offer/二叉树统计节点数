@@ -1,0 +1,128 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+'''
+@author: zouyang
+@file: 二叉树统计节点.py
+@time: 2019/4/30 14:10
+'''
+
+class Tree(object):
+    def __init__(self, value):
+        self._root = Node(None, None, value=value)
+
+    @property
+    def root(self):
+        return self._root
+
+
+
+######################################################################################
+'''
+分层遍历，使用队列实现
+'''
+def layer_order(root):
+    if not isinstance(root, Node):
+        return None
+
+    queue = [root.value, root.left_child, root.right_child]
+    result = []
+    while queue:
+        temp = queue.pop(0)
+        if temp:
+            if isinstance(temp, Node):
+                queue.append(temp.value)
+                queue.append(temp.left_child)
+                queue.append(temp.right_child)
+            else:
+                result.append(temp)
+
+    return result
+
+#########################################################################################
+
+'''
+计算二叉树结点个数，递归方式
+NodeCount(root) = NodeCount(root.left_child) + NodeCount(root.right_child)
+'''
+def node_count(root):
+    if root and not isinstance(root, Node):
+        return None
+
+    if root:
+        return node_count(root.left_child) + node_count(root.right_child) + 1
+    else:
+        return 0
+
+'''
+计算二叉树结点个数，非递归方式
+借用分层遍历计算
+'''
+def node_count_not_recursion(root):
+    if root and not isinstance(root, Node):
+        return None
+
+    return len(layer_order(root))
+
+###############################################################################################
+
+'''
+计算二叉树第k层节点个数，递归方式
+kth_node_count(root, k) = kth_node_count(root.left_count, k-1) + kth_node_count(root.right_count, k-1)
+'''
+def kth_node_count(root, k):
+    if root and not isinstance(root, Node):
+        return None
+
+    if not root or k <= 0:
+        return 0
+    if k == 1:
+        return 1
+    return kth_node_count(root.left_child, k-1) + kth_node_count(root.right_child, k-1)
+
+
+'''
+计算二叉树第K层节点个数，非递归方式
+'''
+def kth_node_count_not_recursion(root, k):
+    if root and not isinstance(root, Node):
+        return None
+
+    if not root or k <= 0:
+        return 0
+
+    if k == 1:
+        return 1
+
+    queue = [(root, 1)]
+    result = 0
+    while queue:
+        temp_node, temp_layer = queue.pop(0)
+        if temp_node:
+            if temp_layer == k:
+                result += 1
+            elif temp_layer > k:
+                return result
+            else:
+                queue.append((temp_node.left_child, temp_layer+1))
+                queue.append((temp_node.right_child, temp_layer+1))
+    return result
+
+
+###########################################################################################
+
+'''
+计算二叉树叶子节点个数，递归方式
+关键点是叶子节点的判断标准，左右孩子皆为None
+'''
+def leaf_count(root):
+    if root and not isinstance(root, Node):
+        return None
+
+    if not root:
+        return 0
+    if not root.left_child and not root.right_child:  ### 只有root节点
+        return 1
+
+    return leaf_count(root.left_child) + leaf_count(root.right_child)
+
+#############################################################################################
